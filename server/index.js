@@ -1,8 +1,10 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 3001;
 
 app.use(express.json());
+app.use(cors());
 
 const TEST_USER = {
   username: 'testuser',
@@ -25,6 +27,7 @@ function login(postParams) {
 
 app.post('/api/login', (req, res) => {
   const userDetails = login(req.body);
+  console.log(userDetails);
   if (userDetails) {
     res
       .status(200)
