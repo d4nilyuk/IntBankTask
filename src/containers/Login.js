@@ -1,12 +1,17 @@
 import { Button, TextField } from "@material-ui/core";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
-import PropTypes from 'prop-types';
 import { useDispatch } from "react-redux";
+import { setUserDetails } from "../actions/session";
+import Alert from '@mui/material/Alert';
+import { Snackbar } from "@material-ui/core";
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [alertMessage, setAlertMessage] = useState(false);
+
     const history = useHistory();
     const dispatch = useDispatch();
 
@@ -33,38 +38,41 @@ function Login() {
                 },
             ).then(responseJson => {
                 if (responseJson.status === 200) {
-                    alert('200');
-                    dispatch(Login({
-                        username:username,
-                        fullname:username.toUpperCase()
-                    }))
                     history.push('/');
-                } else if (responseJson.status === 404) {
-                    alert('404');
+                    dispatch(setUserDetails({
+                        username: username,
+                        fullname: username,
+                    }))
                 } else if (responseJson.status === 401) {
-                    alert('401');
+                    setErrorMessage("User does not exist!")
+                    setAlertMessage(true);
                 } else {
-                    alert(responseJson.status);
+                    setErrorMessage("Page is not found!")
+                    setAlertMessage(true);
                 }
             }).catch(error => {
-                    console.error(error);
+                console.error(error);
             });
         } else {
-            alert("Password and username should not be empty!");
+            setErrorMessage("Please enter the password and username!");
+            setAlertMessage(true);
         }
     };
 
     function handleReset() {
         setUsername("");
         setPassword("");
+        setErrorMessage("");
+        setAlertMessage(false);
     }
 
     return (
         <div className="Login" style={{ textAlign: 'center' }}>
             <h1>Please log in below</h1>
-            <form onSubmit={handleSubmitButton} >
+            <form data-testid="login-form" id="login-form" onSubmit={handleSubmitButton} >
                 <TextField
                     id="username"
+                    data-testid="username"
                     label="Username"
                     variant="outlined"
                     autoFocus
@@ -86,6 +94,11 @@ function Login() {
                     autoComplete="on"
                 />
                 <br />
+                {validate ?
+                    <Snackbar open={alertMessage} sx={{ width: '20%' }}>
+                        <Alert severity="error">{errorMessage}</Alert>
+                    </Snackbar> : null
+                }
                 <Button variant="contained" type="submit" style={{ margin: 10 }}>
                     Login
                 </Button>
@@ -96,10 +109,5 @@ function Login() {
         </div>
     )
 }
-
-Login.propTypes = {
-    setToken: PropTypes.func.isRequired
-}
-
 
 export default Login;

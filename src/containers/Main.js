@@ -1,36 +1,33 @@
 import * as React from 'react';
 import { bool, func } from 'prop-types';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { push } from 'connected-react-router';
-import MuiAlert from '@mui/material/Alert';
-
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import { SESSION_ACTIONS } from '../actions/types';
-
 import AppToolbar from '../components/AppToolbar';
 
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 function Main({ isLoggedIn, logout, push }) {
+  const [open] = React.useState(true);
+  const dispatch = useDispatch();
   const handleLogin = () => {
     push('/login');
   };
 
   return (
     <>
-    <AppToolbar
-      isLoggedIn={isLoggedIn}
-      onLogin={handleLogin}
-      onLogout={logout} />
-      
-    <Alert severity="success" sx={{ width: '100%' }}>
-    This is a success message!
-    </Alert>
-      
-      
-      </>
+      <AppToolbar
+        isLoggedIn={isLoggedIn}
+        onLogin={handleLogin}
+        onLogout={logout} />
+        
+      {isLoggedIn ?
+        <Snackbar disableWindowBlurListener={true} open={open} sx={{ width: '20%' }}>
+          <Alert severity="success">Successfully Logged in</Alert>
+        </Snackbar>
+        : null}
+    </>
   );
 }
 
